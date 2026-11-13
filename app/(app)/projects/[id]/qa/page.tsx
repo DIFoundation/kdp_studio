@@ -63,10 +63,10 @@ export default async function QaPage({
           <CardContent>
             {!reports || reports.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No checks run yet. Click "Run quality checks" to analyze the manuscript.
+                No checks run yet. Click &aquot;Run quality checks&aquot; to analyze the manuscript.
               </p>
             ) : (
-              <ul className="max-h-[480px] space-y-2 overflow-y-auto text-sm">
+              <ul className="max-h-120 space-y-2 overflow-y-auto text-sm">
                 {reports.map((r) => (
                   <li key={r.id} className="flex items-start justify-between gap-3 rounded-md border px-3 py-2">
                     <div>

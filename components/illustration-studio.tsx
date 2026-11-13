@@ -108,7 +108,7 @@ export function IllustrationStudio({
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Select value={sectionId || "none"} onValueChange={(v) => setSectionId(v === "none" ? "" : v)}>
-            <SelectTrigger className="h-8 w-[220px] text-xs">
+            <SelectTrigger className="h-8 w-55 text-xs">
               <SelectValue placeholder="Link to section (optional)" />
             </SelectTrigger>
             <SelectContent>
@@ -122,7 +122,7 @@ export function IllustrationStudio({
             value={style}
             onChange={(e) => setStyle(e.target.value)}
             placeholder="Style override (optional)"
-            className="h-8 w-[220px] text-xs"
+            className="h-8 w-55 text-xs"
           />
           <Button size="sm" onClick={generate} disabled={pending} className="ml-auto">
             {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
@@ -144,7 +144,7 @@ export function IllustrationStudio({
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {illustrations.map((ill) => (
             <div key={ill.id} className="overflow-hidden rounded-lg border">
-              <div className="aspect-[4/3] bg-muted">
+              <div className="aspect-4/3 bg-muted">
                 {ill.url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={ill.url} alt={ill.prompt} className="h-full w-full object-cover" />

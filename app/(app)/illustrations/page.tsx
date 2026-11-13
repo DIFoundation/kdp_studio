@@ -30,7 +30,7 @@ export default async function IllustrationsPage() {
           <CardContent className="py-12 text-center">
             <ImageIcon className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              No illustrated projects yet. Create a children's, colouring, or
+              No illustrated projects yet. Create a children&apos;s, colouring, or
               educational book to unlock the studio.
             </p>
             <Button asChild className="mt-4">

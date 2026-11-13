@@ -75,7 +75,6 @@ export default async function ManuscriptPage({
             projectId={id}
             sections={sectionsWithVersions}
             hasBible={Boolean(bible)}
-            projectStatus={p.status}
           />
         </CardContent>
       </Card>

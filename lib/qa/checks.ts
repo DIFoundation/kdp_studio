@@ -1,4 +1,4 @@
-import { countWords, stripMarkdown } from "@/lib/export/manuscript";
+import { countWords } from "@/lib/export/manuscript";
 import type { Project, Section, SectionVersion, BookBible } from "@/lib/types";
 
 export interface QaIssue {

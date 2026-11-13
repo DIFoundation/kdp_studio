@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,7 +56,7 @@ interface WizardProps {
 }
 
 export function Wizard({ initialCategory, defaultAuthorName }: WizardProps) {
-  const router = useRouter();
+  // const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [step, setStep] = useState(0);
 

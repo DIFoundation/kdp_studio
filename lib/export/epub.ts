@@ -10,7 +10,7 @@ function inline(md: string): string {
   return esc(stripMarkdown(md));
 }
 
-function sectionXhtml(section: { title: string; content: string }, index: number): string {
+function sectionXhtml(section: { title: string; content: string }): string {
   const body = markdownToBlocks(section.content)
     .map((b) => {
       if (b.type === "h1") return `<h2>${inline(b.text)}</h2>`;
@@ -58,7 +58,7 @@ export async function buildEpub(m: Manuscript): Promise<Buffer> {
 
   m.sections.forEach((s, i) => {
     const fileName = `section${i + 1}.xhtml`;
-    zip.file(`OEBPS/${fileName}`, sectionXhtml(s, i));
+    zip.file(`OEBPS/${fileName}`, sectionXhtml(s));
     manifestItems.push(
       `<item id="s${i + 1}" href="${fileName}" media-type="application/xhtml+xml"/>`,
     );

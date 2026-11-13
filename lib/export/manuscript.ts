@@ -1,4 +1,4 @@
-import type { Project, Section, SectionVersion, BookBible } from "@/lib/types";
+import type { Project, Section, BookBible } from "@/lib/types";
 
 /** A manuscript section ready for export: metadata + approved/latest content. */
 export interface ManuscriptSection {

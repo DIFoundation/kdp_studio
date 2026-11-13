@@ -10,7 +10,7 @@ import { STATUS_LABELS, CATEGORY_LABELS, type Project, type ProjectStatus } from
 async function getStats() {
   const supabase = await createClient();
 
-  const [projectsRes, sectionsRes, illustrationsRes, coversRes, exportsRes, recentRes] =
+  const [projectsRes, sectionsRes, illustrationsRes, coversRes, exportsRes, recentRes, usageRes] =
     await Promise.all([
       supabase.from("projects").select("id, status"),
       supabase.from("sections").select("id", { count: "exact", head: true }),
@@ -22,6 +22,10 @@ async function getStats() {
         .select("*")
         .order("updated_at", { ascending: false })
         .limit(5),
+      supabase
+        .from("usage_events")
+        .select("estimated_cost_usd, kind")
+        .gte("created_at", new Date(Date.now() - 30 * 86400_000).toISOString()),
     ]);
 
   const projects = (projectsRes.data ?? []) as Pick<Project, "id" | "status">[];
@@ -38,6 +42,11 @@ async function getStats() {
     covers: coversRes.count ?? 0,
     exports: exportsRes.count ?? 0,
     recent: (recentRes.data ?? []) as Project[],
+    aiSpend30d: ((usageRes.data ?? []) as { estimated_cost_usd: number | null }[]).reduce(
+      (sum, u) => sum + (u.estimated_cost_usd ?? 0),
+      0,
+    ),
+    aiCalls30d: usageRes.data?.length ?? 0,
   };
 }
 
@@ -86,6 +95,28 @@ export default async function DashboardPage() {
           </Card>
         ))}
       </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <div>
+            <CardTitle className="text-base">AI usage — last 30 days</CardTitle>
+            <CardDescription>Estimated spend across all providers</CardDescription>
+          </div>
+          <Link href="/settings" className="text-sm text-primary hover:underline">
+            Provider settings
+          </Link>
+        </CardHeader>
+        <CardContent className="flex items-baseline gap-6">
+          <div>
+            <div className="text-2xl font-bold">${stats.aiSpend30d.toFixed(2)}</div>
+            <div className="text-xs text-muted-foreground">estimated cost</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold">{stats.aiCalls30d}</div>
+            <div className="text-xs text-muted-foreground">generations</div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

@@ -86,7 +86,7 @@ export function CoverDesigner({
           <div className="space-y-1">
             <label className="text-xs font-medium text-muted-foreground">Format</label>
             <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
-              <SelectTrigger className="h-9 w-[140px]">
+              <SelectTrigger className="h-9 w-35">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -96,7 +96,7 @@ export function CoverDesigner({
               </SelectContent>
             </Select>
           </div>
-          <div className="min-w-[220px] flex-1 space-y-1">
+          <div className="min-w-55 flex-1 space-y-1">
             <label className="text-xs font-medium text-muted-foreground">Art direction (optional)</label>
             <Input
               value={theme}
@@ -108,7 +108,7 @@ export function CoverDesigner({
           <div className="space-y-1">
             <label className="text-xs font-medium text-muted-foreground">Concepts</label>
             <Select value={count} onValueChange={setCount}>
-              <SelectTrigger className="h-9 w-[90px]">
+              <SelectTrigger className="h-9 w-22.5">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

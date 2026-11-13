@@ -18,7 +18,7 @@ import {
 } from "@/lib/actions/writing";
 import type { Section, SectionVersion } from "@/lib/types";
 import {
-  Sparkles, Check, X, Save, RefreshCw, Trash2, FileText,
+  Sparkles, Check, X, Save, Trash2, FileText,
   ChevronRight, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,12 +39,10 @@ export function ManuscriptEditor({
   projectId,
   sections,
   hasBible,
-  projectStatus,
 }: {
   projectId: string;
   sections: SectionWithVersion[];
   hasBible: boolean;
-  projectStatus: string;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -101,7 +99,7 @@ export function ManuscriptEditor({
             </Button>
           </div>
         </div>
-        <div className="h-[560px] overflow-y-auto">
+        <div className="h-140 overflow-y-auto">
           {sections.length === 0 ? (
             <div className="p-4 text-sm text-muted-foreground">
               {!hasBible
@@ -143,7 +141,7 @@ export function ManuscriptEditor({
       {/* Editor pane */}
       <div className="rounded-lg border">
         {!selected ? (
-          <div className="flex h-[560px] flex-col items-center justify-center gap-3 p-6 text-center text-sm text-muted-foreground">
+          <div className="flex h-140 flex-col items-center justify-center gap-3 p-6 text-center text-sm text-muted-foreground">
             <FileText className="h-8 w-8" />
             <p>Select a section to view or edit its content.</p>
             {sections.length === 0 && hasBible && (
@@ -162,7 +160,7 @@ export function ManuscriptEditor({
               <Input
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                className="h-8 max-w-[280px] text-sm font-medium"
+                className="h-8 max-w-70 text-sm font-medium"
               />
               <Badge variant="secondary" className={STATUS_STYLE[selected.status]}>
                 {selected.status.replace("_", " ")}
@@ -220,7 +218,7 @@ export function ManuscriptEditor({
                   ? ""
                   : "No content yet — click Generate to draft this section with AI."
               }
-              className="min-h-[380px] flex-1 resize-none rounded-none border-0 font-mono text-sm leading-relaxed focus-visible:ring-0"
+              className="min-h-95 flex-1 resize-none rounded-none border-0 font-mono text-sm leading-relaxed focus-visible:ring-0"
             />
 
             <div className="flex flex-wrap items-center gap-2 border-t px-4 py-3">
