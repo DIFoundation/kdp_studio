@@ -1,19 +1,10 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, FileText } from "lucide-react";
+import { ExportPanel, type ExportRecord } from "@/components/export-panel";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 import type { Project } from "@/lib/types";
-
-
-const FORMATS = [
-  { id: "docx", label: "DOCX manuscript" },
-  { id: "pdf", label: "PDF (screen)" },
-  { id: "epub", label: "EPUB (Kindle)" },
-  { id: "print_pdf", label: "Print-ready PDF" },
-  { id: "cover_png", label: "Cover PNG" },
-  { id: "cover_jpg", label: "Cover JPG" },
-] as const;
 
 export default async function ExportPage({
   params,
@@ -33,48 +24,32 @@ export default async function ExportPage({
     .eq("project_id", id)
     .order("created_at", { ascending: false });
 
+  const records: ExportRecord[] = (exports ?? []).map((e) => ({
+    id: e.id,
+    format: e.format,
+    fileSizeBytes: e.file_size_bytes,
+    status: e.status,
+    createdAt: e.created_at,
+  }));
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold tracking-tight">Export & Publishing Package</h2>
+        <Link
+          href={`/projects/${id}`}
+          className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" /> {p.title}
+        </Link>
+        <h1 className="text-2xl font-bold tracking-tight">Export & Publishing Package</h1>
         <p className="text-sm text-muted-foreground">
-          DOCX, PDF, EPUB, and print-ready files — Phase 4 module.
+          Generate DOCX, PDF, and EPUB files from your approved manuscript.
         </p>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Available export formats</CardTitle>
-          <CardDescription>
-            Formats for {p.formats.join(", ")} · {p.trim_size ?? "custom"} trim
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {FORMATS.map((f) => {
-              const done = exports?.some((e) => e.format === f.id && e.status === "ready");
-              return (
-                <div
-                  key={f.id}
-                  className="flex items-center justify-between rounded-lg border px-4 py-3"
-                >
-                  <span className="flex items-center gap-2 text-sm">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                    {f.label}
-                  </span>
-                  {done ? (
-                    <Button size="sm" variant="outline" disabled>
-                      <Download className="h-4 w-4" /> Ready
-                    </Button>
-                  ) : (
-                    <Button size="sm" variant="ghost" disabled>
-                      Phase 4
-                    </Button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+        <CardContent className="p-4">
+          <ExportPanel projectId={id} exports={records} />
         </CardContent>
       </Card>
     </div>

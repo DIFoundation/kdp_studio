@@ -44,6 +44,50 @@ function order(envVar: string, available: string[]): string[] {
   return list.filter((id) => available.includes(id));
 }
 
+/**
+ * Convert raw provider error messages (HTTP status codes, JSON blobs,
+ * billing errors) into short human-readable explanations.
+ */
+function humanizeProviderError(raw: string): string {
+  const msg = raw.toLowerCase();
+
+  // Billing / credits
+  if (msg.includes("no credits remaining") || msg.includes("credit balance is too low") || msg.includes("insufficient_quota") || msg.includes("billing")) {
+    return "out of API credits — add credits in the provider's billing settings";
+  }
+  // Rate limits
+  if (msg.includes("429") || msg.includes("rate limit") || msg.includes("rate_limit") || msg.includes("too many requests")) {
+    return "rate limited — too many requests, try again shortly";
+  }
+  // Auth
+  if (msg.includes("401") || msg.includes("403") || msg.includes("invalid api key") || msg.includes("unauthorized") || msg.includes("authentication")) {
+    return "authentication failed — check the API key";
+  }
+  // Provider overload / 5xx
+  if (msg.includes("503") || msg.includes("high demand") || msg.includes("overloaded") || msg.includes("unavailable") || msg.includes("500") || msg.includes("502") || msg.includes("504")) {
+    return "temporarily unavailable — the provider is overloaded, try again later";
+  }
+  // Model issues
+  if (msg.includes("model") && (msg.includes("not found") || msg.includes("does not exist") || msg.includes("not supported"))) {
+    return "requested model is not available on this provider";
+  }
+  // Context / token limits
+  if (msg.includes("context length") || msg.includes("maximum context") || msg.includes("token limit") || msg.includes("too long")) {
+    return "request too large — the prompt exceeds the model's context limit";
+  }
+  // Content policy
+  if (msg.includes("content policy") || msg.includes("content_filter") || msg.includes("safety") || msg.includes("blocked")) {
+    return "request blocked by the provider's content policy";
+  }
+
+  // Fallback: strip JSON noise and truncate
+  const cleaned = raw
+    .replace(/\{[\s\S]*\}/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return cleaned.length > 120 ? `${cleaned.slice(0, 117)}…` : cleaned || "unknown error";
+}
+
 export function listTextProviders(): { id: string; displayName: string; configured: boolean }[] {
   return order("AI_TEXT_PROVIDERS", Object.keys(textProviders)).map((id) => {
     const p = textProviders[id]();
@@ -79,7 +123,8 @@ export async function generateTextWithFallback(
         },
       };
     } catch (err) {
-      errors.push(`${id}: ${err instanceof Error ? err.message : String(err)}`);
+      const raw = err instanceof Error ? err.message : String(err);
+      errors.push(`${id}: ${humanizeProviderError(raw)}`);
     }
   }
   throw new Error(
@@ -110,7 +155,8 @@ export async function generateImageWithFallback(
         },
       };
     } catch (err) {
-      errors.push(`${id}: ${err instanceof Error ? err.message : String(err)}`);
+      const raw = err instanceof Error ? err.message : String(err);
+      errors.push(`${id}: ${humanizeProviderError(raw)}`);
     }
   }
   throw new Error(

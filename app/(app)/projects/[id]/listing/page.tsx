@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search } from "lucide-react";
+import { ListingEditor, type ListingData, type ResearchData } from "@/components/listing-editor";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 import type { Project } from "@/lib/types";
-
 
 export default async function ListingPage({
   params,
@@ -17,42 +18,46 @@ export default async function ListingPage({
   if (!project) notFound();
   const p = project as Project;
 
-  const { data: listing } = await supabase.from("listings").select("*").eq("project_id", id).single();
+  const { data: listing } = await supabase
+    .from("listings")
+    .select("*")
+    .eq("project_id", id)
+    .maybeSingle();
+
+  const researchNotes = listing?.research_notes as Record<string, unknown> | null;
+  const research = (researchNotes?.keywords as ResearchData | undefined) ?? null;
+
+  const initial: ListingData = {
+    title: listing?.title ?? p.title,
+    subtitle: listing?.subtitle ?? p.subtitle ?? "",
+    description: listing?.description ?? "",
+    keywords: listing?.keywords ?? [],
+    categories: listing?.categories ?? [],
+    targetAudience: listing?.target_audience ?? p.target_audience ?? "",
+    authorBio: listing?.author_bio ?? "",
+    seriesName: listing?.series_name ?? "",
+    seriesDescription: listing?.series_description ?? "",
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold tracking-tight">KDP Listing</h2>
+        <Link
+          href={`/projects/${id}`}
+          className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" /> {p.title}
+        </Link>
+        <h1 className="text-2xl font-bold tracking-tight">KDP Listing</h1>
         <p className="text-sm text-muted-foreground">
-          Title, description, keywords, and categories — Phase 5 module.
+          Title, description, keywords, and categories — optimized for Amazon search.
+          All copy is editable; AI estimates are labeled as such.
         </p>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Listing assets</CardTitle>
-          <CardDescription>
-            {listing ? "Listing draft exists" : "No listing generated yet"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          {[
-            ["Title", listing?.title ?? p.title],
-            ["Subtitle", listing?.subtitle ?? p.subtitle],
-            ["Description", listing?.description ? "Generated" : "Not generated"],
-            ["Keywords", listing?.keywords?.length ? `${listing.keywords.length} terms` : "Not generated"],
-            ["Categories", listing?.categories?.length ? listing.categories.join(", ") : "Not generated"],
-          ].map(([k, v]) => (
-            <div key={k} className="flex justify-between gap-4 border-b border-border/60 py-1.5">
-              <span className="text-muted-foreground">{k}</span>
-              <span className="text-right font-medium">{v || "—"}</span>
-            </div>
-          ))}
-          <div className="flex items-start gap-2 rounded-lg bg-accent/40 p-3 text-xs text-muted-foreground">
-            <Search className="mt-0.5 h-4 w-4 shrink-0" />
-            Listing generation will include search-intent analysis and clearly
-            label AI estimates vs. verified research data.
-          </div>
+        <CardContent className="p-4">
+          <ListingEditor projectId={id} initial={initial} research={research} />
         </CardContent>
       </Card>
     </div>
